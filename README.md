@@ -1,1 +1,1 @@
-Injective Domain Contract
+Nibiru Domain Contract
