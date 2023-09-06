@@ -23,6 +23,10 @@ pub enum ExecuteMsg {
         name: String,
         duration: u64,
     },
+    Transfer {
+        name: String,
+        new_owner: Addr,
+    },
     Withdraw { }
 }
 

@@ -52,6 +52,7 @@ pub fn execute(
         ExecuteMsg::UpdateEnabled { enabled } => util::execute_update_enabled(deps.storage, deps.api, info.sender.clone(), enabled),
         ExecuteMsg::Register { name, duration} => execute_register(deps, env, info, name, duration),
         ExecuteMsg::Extend { name, duration} => execute_extend(deps, env, info, name, duration),
+        ExecuteMsg::Transfer { name, new_owner} => execute_transfer(deps, env, info, name, new_owner),
         ExecuteMsg::Withdraw { } => execute_withdraw(deps, env, info),
     }
 }
@@ -130,6 +131,63 @@ pub fn execute_extend(
             attr("action", "register"),
             attr("name", name),
             attr("expired", duration.to_string())
+        ]));
+}
+
+pub fn execute_transfer(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    name: String,
+    new_owner: Addr,
+) -> Result<Response, ContractError> {
+
+    util::check_enabled(deps.storage)?;
+
+    if info.sender.clone() == new_owner {
+        return Err(ContractError::CurrentOwner {});
+    }
+    
+
+    let key = name.as_bytes();
+    let new_name_record = NameRecord { owner: new_owner.clone() };
+    
+    NAMERESOLVER.save(deps.storage, key, &new_name_record)?;
+
+    let addr_key = info.sender.clone();
+
+    let mut addr_record = match ADDRRESOLVER.may_load(deps.storage, addr_key.clone())? {
+        Some(address_records) => address_records,
+        None => vec![],
+    };
+
+    let mut new_addr_record_expired = 0;
+
+    for record in &mut addr_record {
+        if record.name == name {
+            new_addr_record_expired = record.expired;
+            break;
+        }
+    }
+
+    addr_record.retain(|record| record.name != name);
+
+    
+    let mut new_addr_record = match ADDRRESOLVER.may_load(deps.storage, new_owner.clone())? {
+        Some(address_records) => address_records,
+        None => vec![],
+    };
+
+    new_addr_record.push(AddressRecord{name : name.clone(), expired: new_addr_record_expired});
+
+    ADDRRESOLVER.save(deps.storage, addr_key, &addr_record)?;
+    ADDRRESOLVER.save(deps.storage, new_owner.clone(), &new_addr_record)?;
+
+    return Ok(Response::new()
+        .add_attributes(vec![
+            attr("action", "transfer"),
+            attr("name", name),
+            attr("new_owner", new_owner)
         ]));
 }
 

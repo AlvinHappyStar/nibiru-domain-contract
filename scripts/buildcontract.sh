@@ -27,9 +27,9 @@ case $NETWORK in
     ADDR_ADMIN=$ADDR_LOCAL
     ;;
   testnet)
-    NODE="https://rpc.itn-1.nibiru.fi:443"
+    NODE="https://rpc.itn-2.nibiru.fi:443"
     DENOM=unibi
-    CHAIN_ID=nibiru-itn-1
+    CHAIN_ID=nibiru-itn-2
     LP_TOKEN_CODE_ID=123
     WALLET="--from testnet-key"
     ADDR_ADMIN="nibi1dg46zswvavn8e6h5y6st34p6j5h3xf5m6ka4q4"
@@ -163,12 +163,17 @@ InstantiateIncentive() {
 
 ClaimRegister() {
     CONTRACT_INCENTIVE=$(cat $ADDRESS_DIR"domain")
-    echo $(nibid tx wasm execute $CONTRACT_INCENTIVE '{"register": {"name": "name", "duration": 2}}' --amount 1000000$DENOM --from st $TXFLAG)
+    echo $(nibid tx wasm execute $CONTRACT_INCENTIVE '{"register": {"name": "name3", "duration": 1}}' --amount 1$DENOM --from testnet-key $TXFLAG)
 }
 
 ClaimExtend() {
     CONTRACT_INCENTIVE=$(cat $ADDRESS_DIR"domain")
     echo $(nibid tx wasm execute $CONTRACT_INCENTIVE '{"extend": {"name": "name2", "duration": 1}}' --amount 1000000$DENOM --from st $TXFLAG)
+}
+
+ClaimTransfer() {
+    CONTRACT_INCENTIVE=$(cat $ADDRESS_DIR"domain")
+    echo $(nibid tx wasm execute $CONTRACT_INCENTIVE '{"transfer": {"name": "name", "new_owner": "nibi1ev6ssfekarh6qnd469exdephd29u4llx93e39a"}}' --amount 1$DENOM --from testnet-key $TXFLAG)
 }
 
 WithDraw() {

@@ -28,6 +28,9 @@ pub enum ContractError {
     #[error("Name has been taken (name {name})")]
     NameTaken { name: String },
 
+    #[error("Current Owner")]
+    CurrentOwner {},
+
     #[error("Cannot migrate from different contract type: {previous_contract}")]
     CannotMigrate { previous_contract: String },
 }
