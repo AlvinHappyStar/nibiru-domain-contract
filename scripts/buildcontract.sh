@@ -27,9 +27,9 @@ case $NETWORK in
     ADDR_ADMIN=$ADDR_LOCAL
     ;;
   testnet)
-    NODE="https://rpc.itn-2.nibiru.fi:443"
+    NODE="https://rpc.itn-1.nibiru.fi:443"
     DENOM=unibi
-    CHAIN_ID=nibiru-itn-2
+    CHAIN_ID=nibiru-itn-1
     LP_TOKEN_CODE_ID=123
     WALLET="--from testnet-key"
     ADDR_ADMIN="nibi1dg46zswvavn8e6h5y6st34p6j5h3xf5m6ka4q4"
@@ -163,7 +163,7 @@ InstantiateIncentive() {
 
 ClaimRegister() {
     CONTRACT_INCENTIVE=$(cat $ADDRESS_DIR"domain")
-    echo $(nibid tx wasm execute $CONTRACT_INCENTIVE '{"register": {"name": "name3", "duration": 1}}' --amount 1$DENOM --from testnet-key $TXFLAG)
+    echo $(nibid tx wasm execute $CONTRACT_INCENTIVE '{"register": {"name": "qwer", "duration": 1}}' --amount 1000000$DENOM --from st $TXFLAG)
 }
 
 ClaimExtend() {
@@ -246,8 +246,8 @@ if [[ $FUNCTION == "" ]]; then
     # CATEGORY=domain
     #  Upload
     
-    InstantiateIncentive
-    # ClaimRegister
+    # InstantiateIncentive
+    ClaimRegister
     # ClaimExtend
     # WithDraw
     #printf "y\npassword\n" | Upload
